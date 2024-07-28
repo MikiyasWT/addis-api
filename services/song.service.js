@@ -45,7 +45,7 @@ exports.create = (Model) => async (req, res, next) => {
 };
 
 exports.getOne = (Model, popOptions) =>
-    catchAsyncErrors(async (req, res, next) => {
+  catchAsyncErrors(async (req, res, next) => {
     let query = Model.findById(req.params.id);
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
@@ -61,8 +61,8 @@ exports.getOne = (Model, popOptions) =>
   });
 
 exports.getAll = (Model) =>
-    catchAsyncErrors(async (req, res, next) => {
-    let filter = {};
+  catchAsyncErrors(async (req, res, next) => {
+    const filter = {};
 
     const features = new APIFeatures(Model.find(filter), req.query)
       .filter()

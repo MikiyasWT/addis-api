@@ -1,5 +1,5 @@
 const express = require("express");
-const { songValidation } = require('../validations/songValidation');
+const { songValidation } = require("../validations/songValidation");
 const {
   getAllSongs,
   addSong,
@@ -14,7 +14,10 @@ const router = express.Router();
 router.route("/").get(getAllSongs, songValidation).post(addSong);
 // router.route("/count").get(getStat);
 
-router.route("/:id").get(getSongById).delete(deleteSongById).patch(updateSongById);
+router
+  .route("/:id")
+  .get(getSongById)
+  .delete(deleteSongById)
+  .patch(updateSongById);
 
 module.exports = router;
-
