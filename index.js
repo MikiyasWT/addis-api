@@ -1,44 +1,35 @@
-const http = require('http');
-const express = require('express');
-const config = require('./config/config');
-const loader = require('./loaders');
-const logger = require('./config/logger');
+const app = require('./server');
+const {connectToDatabase} = require('./config/database')
+//defining middlewares
+require("dotenv").config({ path: "config/config.env" });
 
-const exitHandler = (server) => {
-  if (server) {
+connectToDatabase();
+
+const PORT = process.env.PORT || 5000;
+
+const server = app.listen(PORT, () => {
+    console.log(`app running on http://localhost:${PORT}`)
+});
+
+process.on('uncaughtException',()=>{
+    console.log("\x1b[31m%s\x1b[0m", `ERROR: ${err.stack}`);
+    console.log(
+      "\x1b[34m%s\x1b[0m",
+      "Shutting down the server due to uncaughtException"
+    );
     server.close(() => {
-      logger.info('Server closed');
+        process.exit(1);
+      });
+});
+
+//Handle Unhandled Promise rejections
+process.on("unhandledRejection", (err) => {
+    console.log("\x1b[31m%s\x1b[0m", `ERROR: ${err.stack}`);
+    console.log(
+      "\x1b[34m%s\x1b[0m",
+      "Shutting down the server due to Unhandled Promise rejection"
+    );
+    server.close(() => {
       process.exit(1);
     });
-  } else {
-    process.exit(1);
-  }
-};
-
-const unExpectedErrorHandler = (server) => {
-  return function (error) {
-    logger.error(error);
-    exitHandler(server);
-  };
-};
-
-const startServer = async () => {
-  const app = express();
-  await loader(app);
-
-  const httpServer = http.createServer(app);
-  const server = httpServer.listen(config.port, () => {
-    logger.info(`server listening on port ${config.port}`);
   });
-
-  process.on('uncaughtException', unExpectedErrorHandler(server));
-  process.on('unhandledRejection', unExpectedErrorHandler(server));
-  process.on('SIGTERM', () => {
-    logger.info('SIGTERM recieved');
-    if (server) {
-      server.close();
-    }
-  });
-};
-
-startServer();
