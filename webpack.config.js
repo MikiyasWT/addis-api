@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./server.js",
+  entry: "./index.js",
   mode: "development",
   module: {
     rules: [
